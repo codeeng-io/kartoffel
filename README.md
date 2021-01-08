@@ -29,7 +29,7 @@ Create an instance of cache implementation:
 ```scala
 val caffeineAsyncLoader: AsyncLoadingCache[String, DataEntry[String]] =
         Caffeine.newBuilder().buildAsync(_ => DataEntry.empty[String])
-val cache = new CaffeineCache[Dog](caffeineAsyncLoader)
+val cache = new CaffeineCache[String](caffeineAsyncLoader)
 // Put value
 val putResult: Future[String] = cache.put("test", "test")
 val getResult: Future[String] = cache.get("test")
