@@ -28,6 +28,8 @@ import kartoffel.formats.{ CacheDeserializer, CacheSerializer }
 
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CompletionStage
+import scala.concurrent.duration.Duration
+import com.github.benmanes.caffeine.cache.Caffeine
 
 case class DataEntry[S](data: Option[S] = None)
 
@@ -64,4 +66,34 @@ class CaffeineCache[S](cache: AsyncLoadingCache[String, DataEntry[S]]) extends C
         }
       }
     }
+}
+
+object CaffeineCache {
+  def apply[S](
+      maximumSize: Option[Long] = None,
+      expireAfterAccess: Option[Duration] = None,
+      expireAfterWrite: Option[Duration] = None,
+      refreshAfterWrite: Option[Duration] = None
+  ): CaffeineCache[S] = {
+    val builder = Caffeine.newBuilder()
+
+    val builderWithMaxSize = maximumSize.map(maxSize => builder.maximumSize(maxSize)).getOrElse(builder)
+
+    val builderWithExpireAfterAccess =
+      expireAfterAccess
+        .map(duration => builderWithMaxSize.expireAfterAccess(duration._1, duration._2))
+        .getOrElse(builderWithMaxSize)
+
+    val builderWithExpireAfterWrite = expireAfterWrite
+      .map(duration => builderWithExpireAfterAccess.expireAfterWrite(duration._1, duration._2))
+      .getOrElse(builderWithExpireAfterAccess)
+
+    val builderWithRefreshAfterWrite = refreshAfterWrite
+      .map(duration => builderWithExpireAfterWrite.refreshAfterWrite(duration._1, duration._2))
+      .getOrElse(builderWithExpireAfterWrite)
+
+    val caffeineAsyncLoader: AsyncLoadingCache[String, DataEntry[S]] =
+      builderWithRefreshAfterWrite.buildAsync(_ => DataEntry.empty[S])
+    new CaffeineCache(caffeineAsyncLoader)
+  }
 }

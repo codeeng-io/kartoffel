@@ -27,9 +27,7 @@ private implicit val deserializer: CacheDeserializer[String, String] = (serializ
 Create an instance of cache implementation:
 
 ```scala
-val caffeineAsyncLoader: AsyncLoadingCache[String, DataEntry[String]] =
-        Caffeine.newBuilder().buildAsync(_ => DataEntry.empty[String])
-val cache = new CaffeineCache[String](caffeineAsyncLoader)
+val cache = CaffeineCache[String]()
 // Put value
 val putResult: Future[String] = cache.put("test", "test")
 val getResult: Future[String] = cache.get("test")

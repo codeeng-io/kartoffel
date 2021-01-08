@@ -21,7 +21,6 @@
 
 package kartoffel.caffeine
 
-import com.github.benmanes.caffeine.cache.{ AsyncLoadingCache, Caffeine }
 import kartoffel.formats.{ CacheDeserializer, CacheSerializer }
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.concurrent.ScalaFutures
@@ -38,34 +37,30 @@ class CaffeineCacheSpec extends AnyWordSpec with Matchers with ScalaFutures {
     import scala.concurrent.ExecutionContext.Implicits.global
     import kartoffel.async.futureAsync
     "put an object in cache" in {
-      val caffeineAsyncLoader: AsyncLoadingCache[String, DataEntry[Dog]] =
-        Caffeine.newBuilder().buildAsync(_ => DataEntry.empty[Dog])
-      val cache = new CaffeineCache[Dog](caffeineAsyncLoader)
-      val dog   = Dog("Fido", 2)
+      val cache = CaffeineCache[Dog]()
+
+      val dog = Dog("Fido", 2)
       whenReady(cache.put("fido", dog))(_ shouldBe dog)
     }
 
     "get an object from cache" in {
-      val caffeineAsyncLoader: AsyncLoadingCache[String, DataEntry[Dog]] =
-        Caffeine.newBuilder().buildAsync(_ => DataEntry.empty[Dog])
-      val cache = new CaffeineCache[Dog](caffeineAsyncLoader)
-      val dog   = Dog("Fido", 2)
+      val cache = CaffeineCache[Dog]()
+
+      val dog = Dog("Fido", 2)
       whenReady(cache.put("fido", dog))(_ shouldBe dog)
       whenReady(cache.get("fido"))(_ shouldBe Some(dog))
     }
 
     "get None when an object is not present in the cache" in {
-      val caffeineAsyncLoader: AsyncLoadingCache[String, DataEntry[Dog]] =
-        Caffeine.newBuilder().buildAsync(_ => DataEntry.empty[Dog])
-      val cache = new CaffeineCache[Dog](caffeineAsyncLoader)
+      val cache = CaffeineCache[Dog]()
+
       whenReady(cache.get("fido"))(_ shouldBe None)
     }
 
     "overwrite an existing object" in {
-      val caffeineAsyncLoader: AsyncLoadingCache[String, DataEntry[Dog]] =
-        Caffeine.newBuilder().buildAsync(_ => DataEntry.empty[Dog])
-      val cache = new CaffeineCache[Dog](caffeineAsyncLoader)
-      val fido  = Dog("Fido", 2)
+      val cache = CaffeineCache[Dog]()
+
+      val fido = Dog("Fido", 2)
       whenReady(cache.put("fido", fido))(_ shouldBe fido)
       whenReady(cache.get("fido"))(_ shouldBe Some(fido))
       val pluto = Dog("Pluto", 1)
@@ -77,10 +72,9 @@ class CaffeineCacheSpec extends AnyWordSpec with Matchers with ScalaFutures {
   "Caffeine using Cats IO" should {
     import kartoffel.async.cats.catsAsync
     "put and get an object" in {
-      val caffeineAsyncLoader: AsyncLoadingCache[String, DataEntry[Dog]] =
-        Caffeine.newBuilder().buildAsync(_ => DataEntry.empty[Dog])
-      val cache = new CaffeineCache[Dog](caffeineAsyncLoader)
-      val dog   = Dog("Fido", 2)
+      val cache = CaffeineCache[Dog]()
+
+      val dog = Dog("Fido", 2)
       cache.put("fido", dog).unsafeRunSync() shouldBe dog
       cache.get("fido").unsafeRunSync() shouldBe Some(dog)
     }
@@ -90,10 +84,9 @@ class CaffeineCacheSpec extends AnyWordSpec with Matchers with ScalaFutures {
     val runtime = zio.Runtime.default
     import kartoffel.async.zio.zioAsync
     "put and get an object" in {
-      val caffeineAsyncLoader: AsyncLoadingCache[String, DataEntry[Dog]] =
-        Caffeine.newBuilder().buildAsync(_ => DataEntry.empty[Dog])
-      val cache = new CaffeineCache[Dog](caffeineAsyncLoader)
-      val dog   = Dog("Fido", 2)
+      val cache = CaffeineCache[Dog]()
+
+      val dog = Dog("Fido", 2)
       runtime.unsafeRun(cache.put("fido", dog)) shouldBe dog
       runtime.unsafeRun(cache.get("fido")) shouldBe Some(dog)
     }
