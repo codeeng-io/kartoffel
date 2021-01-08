@@ -22,7 +22,7 @@
 package kartoffel.caffeine
 
 import com.github.benmanes.caffeine.cache.{ AsyncLoadingCache, Caffeine }
-import kartoffel.formats.{ CacheDeserializer, CacheSerilizer }
+import kartoffel.formats.{ CacheDeserializer, CacheSerializer }
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.should.Matchers
@@ -30,13 +30,13 @@ import org.scalatest.matchers.should.Matchers
 class CaffeineCacheSpec extends AnyWordSpec with Matchers with ScalaFutures {
   private case class Dog(name: String, age: Int)
 
-  private implicit val dogSerializer: CacheSerilizer[Dog, Dog] = (value: Dog) => value
+  private implicit val dogSerializer: CacheSerializer[Dog, Dog] = (value: Dog) => value
 
   private implicit val dogDeserializer: CacheDeserializer[Dog, Dog] = (serialized: Dog) => serialized
 
   "Caffeine" should {
     import scala.concurrent.ExecutionContext.Implicits.global
-    import kartoffel.async.instances.futureAsync
+    import kartoffel.async.futureAsync
     "put an object in cache" in {
       val caffeineAsyncLoader: AsyncLoadingCache[String, DataEntry[Dog]] =
         Caffeine.newBuilder().buildAsync(_ => DataEntry.empty[Dog])
@@ -75,7 +75,7 @@ class CaffeineCacheSpec extends AnyWordSpec with Matchers with ScalaFutures {
   }
 
   "Caffeine using Cats IO" should {
-    import kartoffel.async.cats.instances.catsAsync
+    import kartoffel.async.cats.catsAsync
     "put and get an object" in {
       val caffeineAsyncLoader: AsyncLoadingCache[String, DataEntry[Dog]] =
         Caffeine.newBuilder().buildAsync(_ => DataEntry.empty[Dog])
@@ -88,7 +88,7 @@ class CaffeineCacheSpec extends AnyWordSpec with Matchers with ScalaFutures {
 
   "Caffeine using ZIO" should {
     val runtime = zio.Runtime.default
-    import kartoffel.async.zio.instances.zioAsync
+    import kartoffel.async.zio.zioAsync
     "put and get an object" in {
       val caffeineAsyncLoader: AsyncLoadingCache[String, DataEntry[Dog]] =
         Caffeine.newBuilder().buildAsync(_ => DataEntry.empty[Dog])

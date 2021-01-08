@@ -1,17 +1,36 @@
-# kartoffel #
+# kartoffel
 
-Welcome to kartoffel!
+## Usage
 
-## Contribution policy ##
+Import desired async context:
 
-Contributions via GitHub pull requests are gladly accepted from their original author. Along with
-any pull requests, please state that the contribution is your original work and that you license
-the work to the project under the project's open source license. Whether or not you state this
-explicitly, by submitting any copyrighted material via pull request, email, or other means you
-agree to license the material under the project's open source license and warrant that you have the
-legal authority to do so.
+```scala
+import scala.concurrent.ExecutionContext.Implicits.global
+import kartoffel.async.futureAsync
+```
 
-## License ##
+Available async contexts are:
 
-This code is open source software licensed under the
-[MIT](https://opensource.org/licenses/MIT) license.
+```scala
+import kartoffel.async.futureAsync
+import kartoffel.async.cats.catsAsync
+import kartoffel.async.zio.zioAsync
+```
+
+Create a serializer and a deserializer implicit values:
+
+```scala
+private implicit val serializer: CacheSerializer[String, String] = (value: String) => value
+private implicit val deserializer: CacheDeserializer[String, String] = (serialized: String) => serialized
+```
+
+Create an instance of cache implementation:
+
+```scala
+val caffeineAsyncLoader: AsyncLoadingCache[String, DataEntry[String]] =
+        Caffeine.newBuilder().buildAsync(_ => DataEntry.empty[String])
+val cache = new CaffeineCache[Dog](caffeineAsyncLoader)
+// Put value
+val putResult: Future[String] = cache.put("test", "test")
+val getResult: Future[String] = cache.get("test")
+```

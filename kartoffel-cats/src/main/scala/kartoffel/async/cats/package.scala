@@ -19,8 +19,8 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package kartoffel.formats
+package kartoffel.async
 
-trait CacheSerilizer[V, S] {
-  def serialize(value: V): S
+package object cats {
+  implicit def catsAsync: CatsIOAsync = new CatsIOAsync
 }

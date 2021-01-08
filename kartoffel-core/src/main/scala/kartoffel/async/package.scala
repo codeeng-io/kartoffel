@@ -19,10 +19,10 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package kartoffel.async
+package kartoffel
 
 import scala.concurrent.ExecutionContext
 
-object instances {
+package object async {
   implicit def futureAsync(implicit executionContext: ExecutionContext): AsyncFuture = new AsyncFuture
 }

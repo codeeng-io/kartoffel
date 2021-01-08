@@ -24,7 +24,7 @@ package kartoffel.caffeine
 import com.github.benmanes.caffeine.cache.AsyncLoadingCache
 import kartoffel.CacheAlgebra
 import kartoffel.async.Async
-import kartoffel.formats.{ CacheDeserializer, CacheSerilizer }
+import kartoffel.formats.{ CacheDeserializer, CacheSerializer }
 
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CompletionStage
@@ -38,7 +38,7 @@ object DataEntry {
 class CaffeineCache[S](cache: AsyncLoadingCache[String, DataEntry[S]]) extends CacheAlgebra[S] {
 
   override def put[F[_], V](key: String, value: V)(implicit
-      cacheSerializer: CacheSerilizer[V, S],
+      cacheSerializer: CacheSerializer[V, S],
       async: Async[F]
   ): F[V] = {
     val completionStage = CompletableFuture.supplyAsync(() => DataEntry(Option(cacheSerializer.serialize(value))))

@@ -19,8 +19,8 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package kartoffel.async.zio
+package kartoffel.formats
 
-object instances {
-  implicit def zioAsync: ZIOAsync = new ZIOAsync
+trait CacheSerializer[V, S] {
+  def serialize(value: V): S
 }

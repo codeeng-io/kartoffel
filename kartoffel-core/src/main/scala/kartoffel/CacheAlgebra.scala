@@ -22,10 +22,10 @@
 package kartoffel
 
 import kartoffel.async.Async
-import kartoffel.formats.{ CacheDeserializer, CacheSerilizer }
+import kartoffel.formats.{ CacheDeserializer, CacheSerializer }
 
 trait CacheAlgebra[S] {
-  def put[F[_], V](key: String, value: V)(implicit cacheSerializer: CacheSerilizer[V, S], async: Async[F]): F[V]
+  def put[F[_], V](key: String, value: V)(implicit cacheSerializer: CacheSerializer[V, S], async: Async[F]): F[V]
 
   def get[F[_], V](key: String)(implicit cacheDeserializer: CacheDeserializer[V, S], async: Async[F]): F[Option[V]]
 }

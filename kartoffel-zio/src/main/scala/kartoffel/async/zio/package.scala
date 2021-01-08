@@ -19,8 +19,8 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package kartoffel.async.cats
+package kartoffel.async
 
-object instances {
-  implicit def catsAsync: CatsIOAsync = new CatsIOAsync
+package object zio {
+  implicit def zioAsync: ZIOAsync = new ZIOAsync
 }
