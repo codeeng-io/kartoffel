@@ -88,6 +88,29 @@ class RedisCacheSpec
     }
   }
 
+  "Redis cache using Cats IO" should {
+    import kartoffel.async.cats.catsAsync
+    "put and get an object" in {
+      withRedisCache { cache =>
+        val dog = Dog("Doggo", 2)
+        cache.put("doggo", dog).unsafeRunSync() shouldBe dog
+        cache.get("doggo").unsafeRunSync() shouldBe Some(dog)
+      }
+    }
+  }
+
+  "Redis cache using ZIO" should {
+    val runtime = zio.Runtime.default
+    import kartoffel.async.zio.zioAsync
+    "put and get an object" in {
+      withRedisCache { cache =>
+        val dog = Dog("Doge", 2)
+        runtime.unsafeRun(cache.put("doge", dog)) shouldBe dog
+        runtime.unsafeRun(cache.get("doge")) shouldBe Some(dog)
+      }
+    }
+  }
+
   private def withRedisCache(assertions: (RedisCache) => Unit): Unit = {
     val client        = RedisClient.create("redis://localhost:6379")
     val asyncCommands = client.connect().async()
