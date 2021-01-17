@@ -29,6 +29,25 @@ lazy val `kartoffel-caffeine` =
         )
     )
 
+lazy val `kartoffel-redis` =
+  project
+    .in(file("./kartoffel-redis"))
+    .enablePlugins(AutomateHeaderPlugin)
+    .dependsOn(`kartoffel-core`, `kartoffel-cats`, `kartoffel-zio`)
+    .settings(commonSettings)
+    .settings(
+      libraryDependencies ++= Seq(
+          library.lettuce,
+          library.circeCore     % Test,
+          library.circeGeneric  % Test,
+          library.circeParser   % Test,
+          library.scalaCheck    % Test,
+          library.scalaTest     % Test,
+          library.testContainer % Test,
+          library.zio           % Test
+        )
+    )
+
 lazy val `kartoffel-cats` =
   project
     .in(file("./kartoffel-cats"))
@@ -64,17 +83,25 @@ lazy val `kartoffel-zio` =
 lazy val library =
   new {
     object Version {
-      val caffeine   = "2.5.5"
-      val cats       = "2.1.1"
-      val scalaCheck = "1.14.3"
-      val scalaTest  = "3.2.2"
-      val zio        = "1.0.3"
+      val caffeine      = "2.5.5"
+      val cats          = "2.1.1"
+      val circe         = "0.12.3"
+      val lettuce       = "6.0.1.RELEASE"
+      val scalaCheck    = "1.14.3"
+      val scalaTest     = "3.2.2"
+      val testContainer = "0.38.8"
+      val zio           = "1.0.3"
     }
-    val caffeine   = "com.github.ben-manes.caffeine" % "caffeine"    % Version.caffeine
-    val catsEffect = "org.typelevel"                %% "cats-effect" % Version.cats
-    val scalaCheck = "org.scalacheck"               %% "scalacheck"  % Version.scalaCheck
-    val scalaTest  = "org.scalatest"                %% "scalatest"   % Version.scalaTest
-    val zio        = "dev.zio"                      %% "zio"         % Version.zio
+    val caffeine      = "com.github.ben-manes.caffeine" % "caffeine"                       % Version.caffeine
+    val catsEffect    = "org.typelevel"                %% "cats-effect"                    % Version.cats
+    val circeCore     = "io.circe"                     %% "circe-core"                     % Version.circe
+    val circeGeneric  = "io.circe"                     %% "circe-generic"                  % Version.circe
+    val circeParser   = "io.circe"                     %% "circe-parser"                   % Version.circe
+    val lettuce       = "io.lettuce"                    % "lettuce-core"                   % Version.lettuce
+    val scalaCheck    = "org.scalacheck"               %% "scalacheck"                     % Version.scalaCheck
+    val scalaTest     = "org.scalatest"                %% "scalatest"                      % Version.scalaTest
+    val testContainer = "com.dimafeng"                 %% "testcontainers-scala-scalatest" % Version.testContainer
+    val zio           = "dev.zio"                      %% "zio"                            % Version.zio
   }
 
 // *****************************************************************************
@@ -92,6 +119,7 @@ lazy val commonSettings =
         "-unchecked",
         "-deprecation",
         "-language:_",
+        "-target:jvm-11",
         "-encoding",
         "UTF-8",
         "-Ywarn-unused:imports"
